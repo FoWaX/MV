@@ -1,0 +1,19 @@
+dot = [0, 1, 2, 3]
+res = [11, 12, 19, 38]
+table = [[0, 0.5, 1, 1.5, 2, 2.5, 3], []]
+x_dots = [0, 0.5, 1, 1.5, 2, 2.5, 3]
+
+for a in range(7):
+    Ln = 0
+    for n in range(4):
+        chisl = 1
+        znam = 1
+        for i in range(4):
+            if n != i:
+                chisl *= x_dots[a] - dot[i]
+                znam *= dot[n] - dot[i]
+        Ln += res[n] * (chisl / znam)
+    table[1].append(Ln)
+
+for row in table:
+    print("{:^6}    {:^6}    {:^6}    {:^6}    {:^6}    {:^6}    {:^6}".format(*row))
