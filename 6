@@ -1,0 +1,118 @@
+import numpy as np
+
+eps = 1e-6
+
+def gauss(sole):
+    n = len(sole)
+    m = len(sole[0])
+
+    x_coords = list(range(n))
+    for j in range(m - 1):
+        mx = j
+        for i in range(j, n):
+            if abs(sole[i][j]) > abs(sole[mx][j]):
+                mx = i
+        if abs(sole[mx][j]) < eps:
+            sole[j], sole[mx] = sole[mx], sole[j]
+        else:
+            mx = j
+            for i in range(j, n):
+                if abs(sole[j][i]) > abs(sole[j][mx]):
+                    mx = i
+            x_coords[j], x_coords[mx] = x_coords[mx], x_coords[j]
+            for i in range(n):
+                sole[i][j], sole[i][mx] = sole[i][mx], sole[i][j]
+        if abs(sole[j][mx]) < eps:
+            print("Division by zero!")
+            return []
+        for i in range(j + 1, n):
+            d = sole[i][j] / sole[j][j]
+            for k in range(m):
+                sole[i][k] -= sole[j][k] * d
+
+    for j in range(n - 1, -1, -1):
+        for i in range(j - 1, -1, -1):
+            d = sole[i][j] / sole[j][j]
+            sole[i][j] -= sole[j][j] * d
+            sole[i][m - 1] -= sole[j][m - 1] * d
+
+    s = [0] * n
+    for i in range(n):
+        s[x_coords[i]] = sole[i][m - 1] / sole[i][i]
+    return s
+
+def gauss_with_b(A, B):
+    for i in range(len(A)):
+        A[i].append(B[i])
+    return gauss(A)
+
+def det(A):
+    n = len(A)
+    sg = 1
+    for j in range(n):
+        mx = j
+        for i in range(j, n):
+            if abs(A[i][j]) > abs(A[mx][j]):
+                mx = i
+        if abs(A[mx][j]) < eps:
+            sg *= 1 - 2 * (mx != j)
+            A[j], A[mx] = A[mx], A[j]
+        else:
+            mx = j
+            for i in range(j, n):
+                if abs(A[j][i]) > abs(A[j][mx]):
+                    mx = i
+            for i in range(n):
+                A[i][j], A[i][mx] = A[i][mx], A[i][j]
+            sg *= 1 - 2 * (mx != j)
+        for i in range(j + 1, n):
+            d = A[i][j] / A[j][j]
+            for k in range(n):
+                A[i][k] -= A[j][k] * d
+    res = 1
+    for i in range(n):
+        res *= A[i][i]
+    return res * sg
+
+def inv(A):
+    n = len(A)
+    E = np.eye(n)
+    B = [row[:] for row in A]
+    for j in range(n):
+        res = gauss_with_b([row[:] for row in A], E[j])
+        for i in range(n):
+            B[i][j] = res[i]
+    return B
+
+def mul(A, B):
+    n, q, m = len(A), len(B), len(A[0])
+    C = [[0] * m for _ in range(n)]
+    for i in range(n):
+        for j in range(m):
+            for k in range(q):
+                C[i][j] += A[i][k] * B[k][j]
+    return C
+
+def solve():
+    A = [
+        [-3, 1, 3, 4],
+        [3, 0, -1, 4],
+        [-5, 2, 3, 0],
+        [4, -1, 2, -6]
+    ]
+    print("Матрица A:")
+    for row in A:
+        print("\t".join(f"{x:.10f}" for x in row))
+    print("\nОпределитель:", det([row[:] for row in A]), "\n")
+
+    print("Обратная матрица:")
+    B = inv([row[:] for row in A])
+    for row in B:
+        print("\t".join(f"{x:.10f}" for x in row))
+    print("\nПроверка. Произведение матрицы A на обратную:")
+    C = mul(A, B)
+    for row in C:
+        print("\t".join(f"{x:.10f}" for x in row))
+
+if __name__ == "__main__":
+    solve()
