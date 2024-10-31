@@ -2,6 +2,7 @@ import numpy as np
 
 eps = 1e-6
 
+
 def gauss(sole):
     n = len(sole)
     m = len(sole[0])
@@ -70,14 +71,16 @@ def gauss(sole):
 
     return s
 
+
 def gauss_with_b(A, B):
     for i in range(len(A)):
         A[i].append(B[i])
     return gauss(A)
 
+
 def solve():
     n = 5
-    v = 16 
+    v = 11
     A = [[(v + i) / 100 for j in range(n)] for i in range(n)]
     for i in range(n):
         A[i][i] = v + i
@@ -85,10 +88,13 @@ def solve():
     V = [v + i for i in range(n)]
     B = [sum(A[i][j] * V[j] for j in range(n)) for i in range(n)]
 
+    A[0][0] = 0
+
     result = gauss_with_b(A, B)
 
     print("Решение СЛАУ:")
     print("\t".join(f"{x:.10f}" for x in result))
+
 
 if __name__ == "__main__":
     solve()
